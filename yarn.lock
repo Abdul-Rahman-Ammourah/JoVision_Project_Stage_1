@@ -1194,6 +1194,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@react-native-camera-roll/camera-roll@^7.8.1":
+  version "7.8.1"
+  resolved "https://registry.npmjs.org/@react-native-camera-roll/camera-roll/-/camera-roll-7.8.1.tgz"
+  integrity sha512-voVmDlzBS1MVADFk/Vb9GzWzhpoF4ESSjU9qwDNxf/ZA9tirAzX/M0TKcz2V+iFHeRR68cHtZ9tHUhQVG7kJcA==
+
 "@react-native-community/cli-clean@13.6.9":
   version "13.6.9"
   dependencies:
@@ -4351,7 +4356,7 @@ react-native-vision-camera@^4.5.0:
   resolved "https://registry.npmjs.org/react-native-vision-camera/-/react-native-vision-camera-4.5.0.tgz"
   integrity sha512-WvfAad9uMgNmS7sndo+j4XInhwhgt6fpwGqVkt6oU4a2QS9r3DWK5lVm+5nGhMkSUZp5aoKPP0tQGALStNfZeQ==
 
-react-native@*, react-native@0.74.3:
+react-native@*, react-native@>=0.59, react-native@0.74.3:
   version "0.74.3"
   dependencies:
     "@jest/create-cache-key-function" "^29.6.3"
