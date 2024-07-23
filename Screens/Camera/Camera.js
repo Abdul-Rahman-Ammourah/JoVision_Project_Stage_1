@@ -1,31 +1,44 @@
-import React, { useRef, useState,useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, ActivityIndicator } from "react-native";
 import { useCameraDevice, Camera, useCameraPermission } from "react-native-vision-camera";
-import Permission from "./Permission";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { useFocusEffect } from "@react-navigation/native";
 
-export default function CameraS1() {
+import Permission from "./Permission";
+import Footer from '../Footer';
+
+export default function CameraS1({ navigation }) {
     const { requestPermission, hasPermission } = useCameraPermission();
     const [photo, setPhoto] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showCamera, setShowCamera] = useState(true);
+    const [isActive, setIsActive] = useState(false);
     const device = useCameraDevice("back");
     const cameraRef = useRef(null);
 
     useEffect(() => {
-        const renderCamera = async () => {
-            if (hasPermission) {
+        const checkPermission = async () => {
+            const status = await requestPermission();
+            if (status === 'authorized') {
                 setIsLoading(false);
-                Permission();
             }
         };
-        renderCamera();
-    },[])
+        checkPermission();
+    }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsActive(true);
+            return () => setIsActive(false);
+        }, [])
+    );
 
     const takePhoto = async () => {
         try {
             const photo = await cameraRef.current.takePhoto({
                 flash: 'off',
-                qualityPrioritization: 'speed',
+                photoQualityBalance: 'speed',
+                photoQualityPrioritization: 'speed'
             });
             setPhoto(photo);
             setShowCamera(false);
@@ -33,23 +46,41 @@ export default function CameraS1() {
             console.error("Failed to take photo:", error);
         }
     };
+
     const savePhoto = async () => {
-        
+        try {
+            if (photo) {
+                await CameraRoll.saveAsset(`file://${photo.path}`, {
+                    type: 'photo',
+                });
+                console.log("Photo saved successfully");
+                setShowCamera(true);
+            }
+        } catch (error) {
+            console.error("Error while saving the photo", error);
+        }
     };
-    
+
     const discardPhoto = () => {
-       
+        setPhoto(null);
+        setShowCamera(true);
     };
-    
+
     if (!hasPermission) return <Permission />;
-    if (isLoading){
-        return(
+    if (!isLoading) {
+        return (
             <View style={styles.container}>
-                <ActivityIndicator size="large" color={"#0000ff"}  />
-                <Text style={{fontSize:16, color:"black"}}>Waiting for the permission</Text>
+                <ActivityIndicator size="large" color="#0000ff" />
+                <Text style={{ fontSize: 16, color: "black" }}>Waiting for the permission</Text>
+                
+            <View style={styles.footerContainer}>
+                <Footer navigation={navigation} />
             </View>
-        )
+            </View>
+            
+        );
     }
+
     return (
         <View style={styles.container}>
             {showCamera ? (
@@ -58,10 +89,9 @@ export default function CameraS1() {
                         ref={cameraRef}
                         style={StyleSheet.absoluteFill}
                         device={device}
-                        isActive={true}
+                        isActive={isActive}
                         photo={true}
                     />
-
                     <TouchableOpacity style={styles.button} onPress={takePhoto} />
                 </>
             ) : (
@@ -71,23 +101,21 @@ export default function CameraS1() {
                     onRequestClose={() => setShowCamera(true)}
                 >
                     <View style={styles.modal}>
-
-                        <Image source={{ uri: `file://${photo.path}` }} style={styles.image} />
-
+                        {photo && <Image source={{ uri: `file://${photo.path}` }} style={styles.image} />}
                         <View style={styles.modalButtonContainer}>
-
-                            <TouchableOpacity style={styles.modalButton} onPress={() => setShowCamera(true)}>
+                            <TouchableOpacity style={styles.modalButton} onPress={discardPhoto}>
                                 <Text>Discard</Text>
                             </TouchableOpacity>
-
-                            <TouchableOpacity style={styles.modalButton} onPress={null}>
+                            <TouchableOpacity style={styles.modalButton} onPress={savePhoto}>
                                 <Text>Save</Text>
                             </TouchableOpacity>
-
                         </View>
                     </View>
                 </Modal>
             )}
+            <View style={styles.footerContainer}>
+                <Footer navigation={navigation} />
+            </View>
         </View>
     );
 }
@@ -111,11 +139,6 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: '#9F96FF',
     },
-    buttonText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
     image: {
         width: '100%',
         height: '100%',
@@ -126,12 +149,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
+        
     },
-    modalButtonContainer:{
+    modalButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        position: 'relative',
-        bottom: 150,
+        position: 'absolute',
+        bottom: 50,
         width: '100%',
     },
     modalButton: {
@@ -140,7 +164,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 3,
+        borderWidth: 1,
         borderColor: '#9F96FF',
+        borderRadius: 15,
+    },
+    footerContainer: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
     },
 });
