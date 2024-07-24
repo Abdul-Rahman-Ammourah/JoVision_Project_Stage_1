@@ -1,79 +1,61 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Project I
 
-# Getting Started
+In this project, you will work on a navigation stack similar to the one you created in tasks 41 and 42. The project has two stages and involves using the Camera API, Location API, Sensors API, File System, Navigation, and Media Player in React Native.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Stage I
 
-## Step 1: Start the Metro Server
+### Screen One: Title Camera
+- Render a camera and a button that takes photos with it.
+- When the user takes a picture, display it over the camera and ask the user if they want to save or discard it.
+- If the user chooses to discard it, delete it from the device; otherwise, return to the camera for the user to take another picture.
+- Unmount the camera when leaving the Camera page.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+### Screen Two: Title Sensors
+- Show the device's current location: Altitude, Longitude, Latitude, and Speed.
+- Show the current device's X, Y, and Z orientation.
+- Update the location's measurements every 10 seconds.
+- Update the orientation measurements every 500 milliseconds.
+- Stop the location and orientation sensors when leaving the Sensors page.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+### Screen Three: Title Gallery
+- Show a list of all the images captured by this app (that weren't discarded).
+- Add a pull-to-refresh functionality.
 
-```bash
-# using npm
-npm start
+### Screen Four: Title Slideshow
+- Show a list of all the images captured by this app.
+- Disable scrolling.
+- Automatically scroll to the next element (and rotate to the first when the last is reached) every one second.
+- Add a button to pause/resume the slideshow (stop the scrolling when it's enabled and resume it when it's disabled).
 
-# OR using Yarn
-yarn start
-```
+Create a GitHub repo called JoVision Project I Stage I.
 
-## Step 2: Start your Application
+## Stage II
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+### Screen One
+- **Switch Camera Button:** Switch between the front and back camera.
+- **Switch Mode Button:** Switch between video and photo capture.
+- **Take Photo/Record Video Button:** Either take a single image or start recording a video depending on the selected mode. If the camera is recording a video and the button is pressed again, stop recording it.
+- Name each captured image in the following manner: `YourName_CurrentDateAsISOString.mp4/jpg`.
 
-### For Android
+### Screen Two
+- Add an image of your choosing that depicts a car if the speed is more than speed X, a person walking if it's more than Y but less than X, and a person sitting if it's less than Y.
+- Add an image that depicts the orientation of the device: Portrait, Right Landscape, Upside Down, and Left Portrait.
+- Update the image every time the sensors make a new reading. Calculating the device's orientation from the sensor data is optional; you may use a community package to do this for you instead.
+- Note: The image of cars, people, etc., can be icons instead of images.
 
-```bash
-# using npm
-npm run android
+### Screen Three: Title Gallery
+- Show a list of all the images and videos captured by this app, with a pull-to-refresh functionality.
+- When an image or a video is pressed, offer the following operations:
+  - **Rename:** Rename the selected image to a name of your choice.
+  - **Delete:** Delete the selected image from the device.
+  - **Fullscreen:** Send the selected media to Screen Four and navigate to it.
 
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Screen Four: Media Viewer
+- Hidden from the bottom tab navigator and only accessible through Screen Three.
+- If the selected media is a video, play the video and add the following features:
+  - Play/Pause the video.
+  - 5 seconds forward.
+  - 5 seconds rewind.
+  - Next/Previous media file (could be an image or a video).
+- If the selected media is a picture, show the image and add the following features:
+  - Next/Previous media file (could be an image or a video).
