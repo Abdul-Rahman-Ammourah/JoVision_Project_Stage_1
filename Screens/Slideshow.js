@@ -10,7 +10,6 @@ import Rewind from "../assets/Rewind.png";
 
 export default function SlideShow({navigation,route}) {
     const [VideoOptions,setVideoOptions] = useState(false);
-    const [PhotoOptions,setPhotoOptions] = useState(false);
     const [pause,setPause] = useState(false);
     const [currentTime,setCurrentTime] = useState(0);
     const [fileType,setFileType] = useState(null);
