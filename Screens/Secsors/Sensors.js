@@ -26,6 +26,7 @@ RNLocation.configure({
 export default function Sensors({ navigation }) {
   const [location, setLocation] = useState(null);
   const [accelerometerData, setAccelerometerData] = useState(null);
+  const [orientationText, setOrientationText] = useState('Portrait');
 
   // Request location permission and get the location
   const getLocation = async () => {
@@ -41,13 +42,32 @@ export default function Sensors({ navigation }) {
     }
   };
 
-  // Set up accelerometer subscription
+  const determineOrientation = ({ x, y, z }) => {
+    const absX = Math.abs(x);
+    const absY = Math.abs(y);
+    const absZ = Math.abs(z);
+
+    if (absX > absY && absX > absZ) {
+      if (x > 0) {
+        setOrientationText('Landscape Left');
+      } else {
+        setOrientationText('Landscape Right');
+      }
+    } else if (absY > absX && absY > absZ) {
+      if (y > 0) {
+        setOrientationText('Portrait Upside Down');
+      } else {
+        setOrientationText('Portrait');
+      }
+    }
+  };
+
   useEffect(() => {
-    // Set update interval for accelerometer
     setUpdateIntervalForType(SensorTypes.accelerometer, 500); // 500ms
 
     const accelerometerSubscription = accelerometer.subscribe(({ x, y, z }) => {
       setAccelerometerData({ x, y, z });
+      determineOrientation({ x, y, z }); 
     });
 
     const getLocationDetails = setInterval(getLocation, 10000);
@@ -66,7 +86,7 @@ export default function Sensors({ navigation }) {
           <Text>Latitude: {location.latitude}</Text>
           <Text>Longitude: {location.longitude}</Text>
           <Text>Altitude: {location.altitude}</Text>
-          <Text>Speed: {location.speed}</Text>
+          <Text>Speed: {location.speed > 40 ? '🚗' : location.speed > 20 ? '🚶‍♂️' : '🧘'}</Text>
         </View>
       )}
 
@@ -78,6 +98,9 @@ export default function Sensors({ navigation }) {
           <Text>Z: {accelerometerData.z}</Text>
         </View>
       )}
+      
+      <Text style={styles.orientationText}>{orientationText}</Text>
+      
       <View style={styles.footerContainer}>
         <Footer navigation={navigation} />
       </View>
@@ -92,6 +115,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   locationContainer: {
+    marginTop: 20,
+  },
+  orientationText: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginTop: 20,
   },
   footerContainer: {

@@ -1,83 +1,187 @@
 import React,{ useEffect,useRef,useState } from "react";
-import { View,Text,StyleSheet, FlatList,Image } from "react-native";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { View,Text,StyleSheet, FlatList,Image, TouchableOpacity,Modal, TouchableWithoutFeedback, Pressable } from "react-native";
+import Video from "react-native-video";
 
-import Footer from "./Footer";
-export default function SlideShow({navigation}) {
-    const [Photos, setPhotos] = useState([]);
-    const [refresing, setRefresing] = useState(false);
-    const [isPaused,setIsPaused] = useState(false);
-    const Scrollref = useRef(null);
-    const Srollindex = useRef(0);
-    const getPhotos = async () => {
-        try {
-            const result = await CameraRoll.getPhotos({
-                first: 10,
-                assetType: "Photos",
-            });
-            const photoURIs = result.edges.map(edge => edge.node.image.uri);
-            setPhotos(photoURIs);
-        } catch (error) {
-            console.error("Failed to load photos:", error);
+//Images
+import Play from "../assets/Play.png";
+import Pause from "../assets/Pause.png";
+import Forward from "../assets/Forward.png";
+import Rewind from "../assets/Rewind.png";
+
+export default function SlideShow({navigation,route}) {
+    const [VideoOptions,setVideoOptions] = useState(false);
+    const [PhotoOptions,setPhotoOptions] = useState(false);
+    const [pause,setPause] = useState(false);
+    const [currentTime,setCurrentTime] = useState(0);
+    const [fileType,setFileType] = useState(null);
+    const videoRef = useRef(null);
+    const [currentIndex,setCurrentIndex] = useState(route.params.initialIndex);
+    const {file} = route.params;
+    
+    useEffect(() => {
+        file.type[currentIndex] == "video/mp4" ? setFileType(false) : setFileType(true);
+    }, []);
+    const handleRewind = () => {
+        if (videoRef.current) {
+          const newPosition = Math.max(currentTime - 5, 0); 
+          videoRef.current.seek(newPosition);
         }
     };
-    useEffect(() => {
-        getPhotos();
-    }, []);
-    useEffect(() => {
-        if (!isPaused && Photos.length > 0) {
-            const interval = setInterval(() => {
-                Srollindex.current = (Srollindex.current + 1) % Photos.length;
-                Scrollref.current.scrollToIndex({ animated: true, index: Srollindex.current });
-            }, 1000);
 
-            return () => clearInterval(interval);
+    const handleForward = () => {
+        if (videoRef.current) {
+          const newPosition = currentTime + 5; 
+          videoRef.current.seek(newPosition);
         }
-    },[Photos,isPaused])
+    };
+    const handlePrev = () => {
+        if (currentIndex > 0) {
+            // Update currentIndex first
+            setCurrentIndex(prevIndex => {
+                const newIndex = prevIndex - 1;
+                // Determine fileType based on newIndex
+                const newFileType = file.type[newIndex] === "video/mp4" ? false : true;
+                setFileType(newFileType);
+                console.log(file.type[newIndex], newFileType);
+                return newIndex;
+            });
+        }
+    };
     
-    const renderItem = ({ item }) => {
-        return (
-            <View style={styles.container}>
-                <Image source={{ uri: item }} style={styles.Image}/>
-            </View>
-        )
-    }
+    const handleNext = () => {
+        if (currentIndex < file.uri.length - 1) {
+            // Update currentIndex first
+            setCurrentIndex(prevIndex => {
+                const newIndex = prevIndex + 1;
+                // Determine fileType based on newIndex
+                const newFileType = file.type[newIndex] === "video/mp4" ? false : true;
+                setFileType(newFileType);
+                console.log(file.type[newIndex], newFileType);
+                return newIndex;
+            });
+        }
+    };
+
     return (
         <View style={styles.container}>
-            
-            <FlatList
-                    ref={Scrollref}
-                    data={Photos}
-                    renderItem={renderItem}
-                    keyExtractor={(index) => index.toString()}
-                    contentContainerStyle={styles.contentList}
-                    style={styles.list}
-                    horizontal       
-                    scrollEnabled={false}             
-                />
-            <View style={styles.footerContainer}>
-                <Footer navigation={navigation}/>
-            </View>
+            <TouchableOpacity onPress={() => {setVideoOptions(!VideoOptions)}}>
+                {fileType ? (<>
+                    <Image 
+                        source={{ uri: file.uri[currentIndex]}} 
+                        style={styles.image}   
+                        />
+                        <Modal visible={VideoOptions}
+                            transparent={true}
+                            animationType="fade"
+                            >
+                        <TouchableOpacity style={styles.layout} onPress={() => setVideoOptions(!VideoOptions)}>
+                            <TouchableWithoutFeedback>
+                                <View style={styles.VideoModal}>
+                                    <TouchableOpacity onPress={handlePrev}>
+                                        <Text style={styles.text}>
+                                            Prev
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={handleNext}>
+                                        <Text style={styles.text}>
+                                            Next
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </TouchableOpacity>
+                    </Modal>
+                    </>
+                ):(<>
+                    <Video 
+                        ref={videoRef}
+                        source={{ uri: file.uri[currentIndex] }}
+                        style={styles.video}
+                        onError={(error) => console.log("Error", error)}
+                        paused={pause}
+                        onProgress={(data) => setCurrentTime(data.currentTime)}
+                        onEnd={() => videoRef.current.seek(0)} // Better than Repeat
+                        />
+                    <Modal visible={VideoOptions}
+                            transparent={true}
+                            animationType="fade"
+                            >
+                        <TouchableOpacity style={styles.layout} onPress={() => setVideoOptions(!VideoOptions)}>
+                            <TouchableWithoutFeedback>
+                                <View style={styles.VideoModal}>
+                                    <TouchableOpacity onPress={handlePrev}>
+                                        <Text style={styles.text}>
+                                            Prev
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={handleRewind}>
+                                        <Image source={Rewind} />
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={() => setPause(!pause)}>
+                                        <Image source={pause ? Play : Pause} />
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={handleForward}>
+                                        <Image source={Forward} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={handleNext}>
+                                        <Text style={styles.text}>
+                                            Next
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </TouchableOpacity>
+                    </Modal>
+                    </>
+                )}
+            </TouchableOpacity>
         </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: '#000',
+    },
+    image: {
+        width: "100%",
+        height: "100%"
+    },
+    layout:{
         flex: 1,
+        alignItems: 'center',
+    },
+    Modal: {
+        width: '100%',
+        height: 80,
         justifyContent: 'center',
         alignItems: 'center',
-        
+        backgroundColor: '#fff',
     },
-    footerContainer: {
-        position: 'absolute',
-        bottom: 0,
+    ModalText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    video: {
         width: '100%',
+        height: '100%',
+        resizeMode: 'cover', 
     },
-    Image: {
-        width: 300,
-        height: 300,
-        resizeMode: 'cover',
-        
-    }
+    VideoModal: {
+    position: 'absolute',
+    bottom: 100,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingVertical: 10,
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
 })

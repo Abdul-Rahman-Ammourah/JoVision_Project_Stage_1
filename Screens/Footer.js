@@ -15,10 +15,6 @@ export default function Footer({navigation}) {
             <TouchableOpacity style={styles.FooterButton} onPress={() => navigation.navigate("Gallery")}>
                 <Text style={styles.FooterText}>Gallery</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity style={styles.FooterButton} onPress={() => navigation.navigate("SlideShow")}>
-                <Text style={styles.FooterText}>SlideShow</Text>
-            </TouchableOpacity>
         </View>
     );
 }

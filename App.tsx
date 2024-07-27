@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Stack = createNativeStackNavigator();
 //Screens
 import Camera from "./Screens/Camera/Camera";
-import Gallery from "./Screens/Gallery";
+import Gallery from "./Screens/Gallery/Gallery";
 import Sensors from "./Screens/Secsors/Sensors";
 import SlideShow from "./Screens/Slideshow";
 
