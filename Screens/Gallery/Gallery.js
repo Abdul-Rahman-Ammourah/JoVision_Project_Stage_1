@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Image, RefreshControl, TouchableOpacity, Modal, Text, Pressable, TouchableWithoutFeedback } from "react-native";
+import { View, StyleSheet, FlatList, Image, RefreshControl, TouchableOpacity, Modal, TouchableWithoutFeedback } from "react-native";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { Button, TextInput } from "react-native-paper";
 import mime from 'mime';

@@ -1,5 +1,5 @@
 import React,{ useEffect,useRef,useState } from "react";
-import { View,Text,StyleSheet, FlatList,Image, TouchableOpacity,Modal, TouchableWithoutFeedback, Pressable } from "react-native";
+import { View,Text,StyleSheet, Image, TouchableOpacity,Modal, TouchableWithoutFeedback} from "react-native";
 import Video from "react-native-video";
 
 //Images
